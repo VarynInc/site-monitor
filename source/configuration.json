@@ -1,0 +1,54 @@
+{
+    "database": {
+        "host": "localhost",
+        "database": "site-monitor",
+        "user": "db-user",
+        "port": 3306,
+        "password": "dont store your database password here"
+    },
+    "verbose": false,
+    "sites": [
+        {
+            "sitename": "Enginesis",
+            "sampleurl": "https://www.enginesis.com/monitor.php",
+            "samplefrequency": 31,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": ["suppot@enginesis.com", "support@varyn.com"],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "Varyn",
+            "sampleurl": "https://www.varyn.com/monitor.php",
+            "samplefrequency": 32,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": ["suppot@enginesis.com", "support@varyn.com"],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "KillerQuiz",
+            "sampleurl": "https://www.killerquiz.com/monitor.php",
+            "samplefrequency": 33,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": ["suppot@enginesis.com", "support@varyn.com"],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        }
+    ]
+}

@@ -1,0 +1,30 @@
+{
+    "sites": [
+        {
+            "site-name": "Enginesis",
+            "sample-url": "https://www.enginesis.com/monitor.php",
+            "sample-frequency": 30,
+            "expected-token": "PAGEOK",
+            "max-load-time": 7,
+            "alert-load-time": 2,
+            "alert-threshold": 3,
+            "alert-email": ["suppot@enginesis.com", "support@varyn.com"],
+            "alert-sms": [],
+            "debug": false,
+            "log": false
+        },
+        {
+            "site-name": "Varyn",
+            "sample-url": "https://www.varyn.com/monitor.php",
+            "sample-frequency": 30,
+            "expected-token": "PAGEOK",
+            "max-load-time": 7,
+            "alert-load-time": 2,
+            "alert-threshold": 3,
+            "alert-email": ["suppot@enginesis.com", "support@varyn.com"],
+            "alert-sms": [],
+            "debug": false,
+            "log": false
+        }
+    ]
+}

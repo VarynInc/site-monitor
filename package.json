@@ -1,0 +1,37 @@
+{
+  "name": "site-monitor",
+  "version": "0.1.1",
+  "description": "Nodejs app to monitor sites and alert if they are not abiding by their normal operating condition",
+  "main": "source/index.js",
+  "scripts": {
+    "start": "node source/index.js",
+    "test": "jest --coverage test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VarynInc/site-monitor.git"
+  },
+  "keywords": [
+    "javascript",
+    "node",
+    "http",
+    "monitor",
+    "website",
+    "utility"
+  ],
+  "author": "Varyn",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/VarynInc/site-monitor/issues"
+  },
+  "homepage": "https://github.com/VarynInc/site-monitor#readme",
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "express": "^4.16.4",
+    "jest": "^24.3.1",
+    "mysql": "^2.16.0",
+    "nodemailer": "^5.1.1",
+    "request": "^2.88.0",
+    "yargs": "^13.2.2"
+  }
+}
