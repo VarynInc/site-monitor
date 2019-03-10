@@ -3,58 +3,9 @@
  */
 const Chalk = require("chalk");
 const fs = require("fs");
+const WinstonLogger = require("winston");
 const siteMonitor = require("./site-monitor");
 const defaultConfigurationFile = "./source/configuration.json";
-
-
-/**
- * Write a message to a log file.
- * @param {string} message The message to post in the log.
- */
-function writeToLogFile(message) {
-    if (configuration && configuration.logFile) {
-        try {
-            fs.appendFileSync(configuration.logFile, message + "\r\n");
-        } catch (err) {
-            console.log(Chalk.red("Error writing to " + configuration.logFile + ": " + err));
-        }
-    }
-}
-
-/**
- * Show an error message in the log and on the console but only if debugging is enabled.
- * @param {string} message A message to display.
- */
-function errorLog(message) {
-    if (debug) {
-        console.log(Chalk.red(message));
-        writeToLogFile(message);
-    }
-}
-
-/**
- * Show an information message in the log and on the console but only if debugging is enabled.
- * @param {string} message A message to display.
- */
-function debugLog(message) {
-    if (debug) {
-        console.log(Chalk.green(message));
-        writeToLogFile(message);
-    }
-}
-
-/**
- * Show a message in the log and on the console immediately.
- * @param {string} message A message to display.
- */
-function immediateLog(message, error = true) {
-    if (error) {
-        console.log(Chalk.red(message));
-    } else {
-        console.log(Chalk.blue(message));
-    }
-    writeToLogFile(message);
-}
 
 /**
  * Overwrite any configuration options with values provided on the command line.
@@ -98,6 +49,13 @@ function getArgs() {
             type: "number",
             describe: "database host port",
             demandOption: false
+        },
+        "logfile": {
+            alias: "l",
+            type: "string",
+            describe: "path to log file",
+            demandOption: false,
+            default: "site-monitor.log"
         },
         "verbose": {
             alias: "v",
@@ -169,22 +127,33 @@ function mergeArgs(args, configuration) {
 }
 
 function initSiteMonitor() {
+    const logger = WinstonLogger.createLogger({
+        level: "error",
+        transports: [
+            new WinstonLogger.transports.File({ filename: "site-monitor.log" })
+        ]
+    });
     const args = getArgs();
     let configurationFile = args.config || defaultConfigurationFile;
     if (configurationFile.length > 0) {
         configuration = loadConfiguration(configurationFile);
         if (Object.keys(configuration).length === 0) {
-            immediateLog("Configuration file " + configurationFile + " does not exist or is not a valid format.");
+            logger.error("Configuration file " + configurationFile + " does not exist or is not a valid format.");
         } else {
-            immediateLog("Loading configuration from " + configurationFile, false);
+            logger.info("Loading configuration from " + configurationFile);
         }
         mergeArgs(args, configuration);
-        if (siteMonitor.setConfiguration(configuration)) {
-            siteMonitor.startMonitor(configuration.sites);
-            // wait indefinily until the app is terminated
-            
-        }
+        logger.configure({
+            level: configuration.verbose ? "verbose" : "info",
+            transports: [
+                new WinstonLogger.transports.Console(),
+                new WinstonLogger.transports.File({ filename: configuration.logfile })
+            ]
+        });
+
+        siteMonitor.startMonitor(configuration, logger);
     }
 }
+
 
 initSiteMonitor();

@@ -1,28 +1,30 @@
 {
+    "database": {
+        "host": "localhost",
+        "database": "site_monitor",
+        "user": "user",
+        "password": "password",
+        "port": 3306
+    },
+    "websiteport": 3399,
+    "shutdownpassword": "changeme",
+    "verbose": false,
+    "logfile": "site-monitor.log",
     "sites": [
         {
-            "site-name": "Enginesis",
-            "sample-url": "https://www.enginesis.com/monitor.php",
-            "sample-frequency": 30,
-            "expected-token": "PAGEOK",
-            "max-load-time": 7,
-            "alert-load-time": 2,
-            "alert-threshold": 3,
-            "alert-email": ["suppot@enginesis.com", "support@varyn.com"],
-            "alert-sms": [],
-            "debug": false,
-            "log": false
-        },
-        {
-            "site-name": "Varyn",
-            "sample-url": "https://www.varyn.com/monitor.php",
-            "sample-frequency": 30,
-            "expected-token": "PAGEOK",
-            "max-load-time": 7,
-            "alert-load-time": 2,
-            "alert-threshold": 3,
-            "alert-email": ["suppot@enginesis.com", "support@varyn.com"],
-            "alert-sms": [],
+            "sitename": "website",
+            "sampleurl": "https://www.website.com/index.html",
+            "samplefrequency": 31,
+            "expectedtoken": "expected-on-page",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": [
+                "email@here.com",
+                "email@there.com"
+            ],
+            "alertsms": [],
+            "active": true,
             "debug": false,
             "log": false
         }
