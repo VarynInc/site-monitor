@@ -6,6 +6,13 @@
         "password": "password",
         "port": 3306
     },
+    "smtp": {
+        "host": "",
+        "port": 456,
+        "issecure": true,
+        "account": "user",
+        "password": "password"
+    },
     "websiteport": 3399,
     "shutdownpassword": "changeme",
     "verbose": false,

@@ -1,6 +1,8 @@
 const Request = require("request");
 const MySQL = require("mysql");
 const Express = require("express");
+const NodeMailer = require("nodemailer");
+const MailGunTransport = require('nodemailer-mailgun-transport');
 
 let logger = null;
 let timerHandle = null;
@@ -9,6 +11,7 @@ let stopped = false;
 let isUsingDatabase = true;
 let databaseConnection = null;
 let globalDatabaseConfiguration = null;
+let globalEmailConfiguration = null;
 
 SiteMonitor = exports;
 
@@ -319,6 +322,35 @@ function recordSampleSuccess(siteConfiguration, responseTime) {
 }
 
 /**
+ * Send an alert. The type of alert would depend on the site configuration.
+ * 
+ * @param {object} siteConfiguration 
+ */
+async function sendAlert(siteConfiguration) {
+    const emailConfiguration = globalEmailConfiguration;
+    const emailList = siteConfiguration.alertemail;
+    if (emailConfiguration.host && Array.isArray(emailList) && emailList.length > 0) {
+        var nodemailerMailgun = NodeMailer.createTransport(MailGunTransport({
+            auth: {
+                api_key: emailConfiguration.apikey,
+                domain: emailConfiguration.domain
+            }
+        }));
+        let toList = emailList.join(", ");
+        let mailOptions = {
+            from: '"Enginesis Support" <support@enginesis.com>',
+            to: toList,
+            subject: "Site monitor alert from " + siteConfiguration.sitename,
+            text: "* Site monitor alert *\n\nThis is a test alert message from site monitor on behalf of " + siteConfiguration.sitename,
+            html: "<h1>Site monitor alert</h1><p>This is a test alert message from site monitor on behalf of " + siteConfiguration.sitename + "</p>"
+        };
+        logger.info("sending alert email to " + toList + " for site " + siteConfiguration.sitename);
+        let mailResponse = await nodemailerMailgun.sendMail(mailOptions);
+        logger.info("alert email response " + JSON.stringify(mailResponse));
+    }
+}
+
+/**
  * Conduct a sample given the site definition (from the configuration.) This is asynchronous:
  * a Promise is returned that will resolve once the sample is complete.
  * 
@@ -344,6 +376,10 @@ function sampleURL(siteConfiguration) {
                         siteConfiguration.sampleconsecutivefailedcount ++;
                         if (siteConfiguration.sampleconsecutivefailedcount >= siteConfiguration.alertthreshold) {
                             recordSampleErrorThresholdExceeded(siteConfiguration, responseTime);
+                            if ( ! siteConfiguration.alerted) {
+                                siteConfiguration.alerted = true;
+                                sendAlert(siteConfiguration);
+                            }
                         } else {
                             recordSampleSuccess(siteConfiguration, responseTime);
                         }
@@ -478,6 +514,7 @@ function initializeSiteSampling(siteList) {
         siteConfiguration.samplecount = 0;
         siteConfiguration.samplefailedcount = 0;
         siteConfiguration.sampleconsecutivefailedcount = 0;
+        siteConfiguration.alerted = false;
         if (siteConfiguration.active) {
             siteConfiguration.next_sample_time = timenow + siteConfiguration.samplefrequency;
         } else {
@@ -498,6 +535,7 @@ function initializeSiteSampling(siteList) {
  */
 SiteMonitor.startMonitor = async function (configuration, debugLogger) {
     let siteList = configuration.sites;
+    globalEmailConfiguration = configuration.smtp || {};
 
     if (debugLogger) {
         logger = debugLogger;
