@@ -23,9 +23,11 @@ so I won't go over them all here. It should be self-evident but if not we will u
 `configuration-template.json` to `configuration.json` and set it up for your requirements.
 
 You should have a database connection. It's not required, but saving samples to a persistent storage
-is pretty much a requirement for this app.
+is pretty much a requirement for this app. If you use a database, it must exist. The app will
+create the tables if it needs to, but it will not create a database.
 
 Edit `source/configuration.json` with your database connection information and your site definitions.
+
 Set `websiteport` to the port you want to run the web server on (default is 3399). This is for in-bound connections to
 view the stats and operation of the site monitor (the site monitor will handle out-bound requests on
 ports 80 or 443 according to your configuration.)

@@ -463,6 +463,29 @@ function startWebServer(configuration) {
     app.listen(configuration.websiteport || 3399);
 }
 
+/**
+ * Update the site configuration to initialize data sampling state. Validate and setup 
+ * every site for sampling by initializing the records to a base condition.
+ * @param {Array} siteList List of sites to sample.
+ */
+function initializeSiteSampling(siteList) {
+    let timenow = Date.now();
+    for (let siteIndex = 0; siteIndex < siteList.length; siteIndex ++) {
+        let siteConfiguration = siteList[siteIndex];
+
+        // site sample time is specified in seconds, convert that number to milliseconds.
+        siteConfiguration.samplefrequency *= 1000;
+        siteConfiguration.samplecount = 0;
+        siteConfiguration.samplefailedcount = 0;
+        siteConfiguration.sampleconsecutivefailedcount = 0;
+        if (siteConfiguration.active) {
+            siteConfiguration.next_sample_time = timenow + siteConfiguration.samplefrequency;
+        } else {
+            siteConfiguration.next_sample_time = -1;
+        }
+    };
+}
+
 /* =============================================================================
    Exported function interface to operate the site monitor.
    ============================================================================= */
@@ -474,7 +497,6 @@ function startWebServer(configuration) {
  * @param {object} debugLogger The logging facility.
  */
 SiteMonitor.startMonitor = async function (configuration, debugLogger) {
-    let timenow = Date.now();
     let siteList = configuration.sites;
 
     if (debugLogger) {
@@ -482,21 +504,7 @@ SiteMonitor.startMonitor = async function (configuration, debugLogger) {
     }
     initializeDatabase(configuration.database)
         .then(function() {
-            // Validate and setup every site for sampling by initializing the records to a base condition.
-            for (let siteIndex = 0; siteIndex < siteList.length; siteIndex ++) {
-                let siteConfiguration = siteList[siteIndex];
-
-                // site sample time is specified in seconds, convert that number to milliseconds.
-                siteConfiguration.samplefrequency *= 1000;
-                siteConfiguration.samplecount = 0;
-                siteConfiguration.samplefailedcount = 0;
-                siteConfiguration.sampleconsecutivefailedcount = 0;
-                if (siteConfiguration.active) {
-                    siteConfiguration.next_sample_time = timenow + siteConfiguration.samplefrequency;
-                } else {
-                    siteConfiguration.next_sample_time = -1;
-                }
-            };
+            initializeSiteSampling(siteList);
             updateSitesTable(siteList)
                 .then(function() {
                     queueNextSample(siteList);
@@ -510,6 +518,9 @@ SiteMonitor.startMonitor = async function (configuration, debugLogger) {
         })
         .catch(function (databaseError) {
             logger.error("startMonitor caught initializeDatabase error " + databaseError.toString());
+            logger.info("startMonitor will start without logging to a database");
+            initializeSiteSampling(siteList);
+            queueNextSample(siteList);
         });
 
     startWebServer(configuration);
