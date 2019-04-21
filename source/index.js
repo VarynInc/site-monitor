@@ -1,5 +1,5 @@
 /**
- * Site Monitor entry point.
+ * Site Monitor web service entry point.
  */
 const Chalk = require("chalk");
 const fs = require("fs");
