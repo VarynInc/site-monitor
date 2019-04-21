@@ -21,7 +21,7 @@ Note you can change the port number in the configuration.
 ## Configuration
 
 The sample `configuration-template.json` contains all available configuration options
-so I won't go over them all here. It should be self-evident but if not we will update this documentation. Rename/copy
+so we won't go over them all here. It should be self-evident but if not we will update this documentation. Rename/copy
 `configuration-template.json` to `configuration.json` and set it up for your requirements.
 
 You should have a database connection. It's not required, but saving samples to a persistent storage
@@ -34,15 +34,21 @@ Set `websiteport` to the port you want to run the web server on (default is 3399
 view the stats and operation of the site monitor (the site monitor will handle out-bound requests on
 ports 80 or 443 according to your configuration.)
 
+If the configuration changes the service must be restarted to read the updated configuration.
+
 ## Operation
 
 ## Deployment
+
+Package and deploy as a Node.js app.
 
 ## License
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 ## Contributing
+
+This is open source software. [Create issues](https://github.com/VarynInc/site-monitor/issues), fork the repo, issue a [pull request](https://github.com/VarynInc/site-monitor/pulls).
 
 ## About
 
