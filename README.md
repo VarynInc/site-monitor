@@ -38,9 +38,27 @@ If the configuration changes the service must be restarted to read the updated c
 
 ## Operation
 
+The web server will run from the port you set in the configuration:
+
+```
+http://localhost:3399/
+```
+
+The web server will serve any static file from your `./source/public` folder.
+
+There is an end point there to stop the server. You need to supply the password you set in your configuration file.
+
+```
+http://localhost:3399/stop?pass=your-password
+```
+
 ## Deployment
 
 Package and deploy as a Node.js app.
+
+Outbound http port 80 must be enabled. Also must allow the database connection based on your configuration.
+
+Inbound http must be enabled on the port you configured if you want access to the static website.
 
 ## License
 

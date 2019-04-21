@@ -467,7 +467,7 @@ function queueNextSample(siteList) {
     } else {
         // Either the monitor was stopped or another sample is in progress.
         // This could lead to a race condition or a drop-out.
-        logger.error("queueNextSample logic error: another sample is in progress OR not sampling.");
+        logger.error("SiteMonitor.queueNextSample logic error: another sample is in progress OR not sampling.");
     }
 }
 
@@ -491,9 +491,13 @@ function startWebServer(configuration) {
 
     app.get("/stop", function(request, response) {
         const query = request.query;
-        logger.info("Stopping site monitor from /stop by " + request.get("referer"));
-        response.send("The STOP function is not implemented. However, pass=" + query.pass);
-        SiteMonitor.stopMonitor();
+        logger.info("Stopping SiteMonitor from /stop by " + request.get("referer") + " from " + request.ip);
+        if (query.pass == configuration.shutdownpassword) {
+            response.send("The STOP function has been invoked. Shutting down site-monitor.");
+            SiteMonitor.stopMonitor();
+        } else {
+            response.send("You contacted the STOP endpoint.");
+        }
     });
     app.use(Express.static("./source/public", staticWebsiteOptions));
     app.listen(configuration.websiteport || 3399);
@@ -545,18 +549,19 @@ SiteMonitor.startMonitor = async function (configuration, debugLogger) {
             initializeSiteSampling(siteList);
             updateSitesTable(siteList)
                 .then(function() {
+                    logger.info("SiteMonitor has started on " + (new Date()).toUTCString());
                     queueNextSample(siteList);
                 })
                 .catch(function(databaseError) {
                     // Even if this update fails let's try to start the monitor anyway
                     // TODO: Log this error
-                    logger.error("startMonitor caught updateSitesTable error " + databaseError.toString());
+                    logger.error("SiteMonitor caught updateSitesTable error " + databaseError.toString());
                     queueNextSample(siteList);
                 });
         })
         .catch(function (databaseError) {
-            logger.error("startMonitor caught initializeDatabase error " + databaseError.toString());
-            logger.info("startMonitor will start without logging to a database");
+            logger.error("SiteMonitor caught initializeDatabase error " + databaseError.toString());
+            logger.info("SiteMonitor will start without logging to a database");
             initializeSiteSampling(siteList);
             queueNextSample(siteList);
         });
@@ -578,6 +583,7 @@ SiteMonitor.dynamicReset = function (configuration) {
  * Stop monitoring. Call this function to shut down the site monitor.
  */
 SiteMonitor.stopMonitor = function() {
+    logger.info("SiteMonitor stopping on " + (new Date()).toUTCString());
     stopped = true;
     if (timerHandle != null) {
         clearTimeout(timerHandle);
