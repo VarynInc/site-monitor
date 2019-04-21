@@ -8,16 +8,6 @@ Nodejs app to monitor sites and alert if they are not abiding by their normal op
 
 `npm install` will install the dependencies.
 
-`npm start` will run the monitor and the web server.
-
-To stop the service, kill the process or hit the stop URL with the URL-encoded password that you set in the configuration:
-
-```
-http://your-site-monitor.com:3399/stop?pass=stopme
-```
-
-Note you can change the port number in the configuration.
-
 ## Configuration
 
 The sample `configuration-template.json` contains all available configuration options
@@ -38,10 +28,12 @@ If the configuration changes the service must be restarted to read the updated c
 
 ## Operation
 
+`npm start` will run the monitor and the web server.
+
 The web server will run from the port you set in the configuration:
 
 ```
-http://localhost:3399/
+http://your-site-monitor-host:3399/
 ```
 
 The web server will serve any static file from your `./source/public` folder.
@@ -49,7 +41,7 @@ The web server will serve any static file from your `./source/public` folder.
 There is an end point there to stop the server. You need to supply the password you set in your configuration file.
 
 ```
-http://localhost:3399/stop?pass=your-password
+http://your-site-monitor-host:3399/stop?pass=your-password
 ```
 
 ## Deployment
