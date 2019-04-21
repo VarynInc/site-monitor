@@ -60,5 +60,8 @@ typings/
 # next.js build output
 .next
 
+# visual studio code
+.vscode
+
 # Don't version that configuration file
 source/configuration.json
