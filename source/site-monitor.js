@@ -1,4 +1,5 @@
 const Request = require("request");
+const fs = require("fs");
 const MySQL = require("mysql");
 const Express = require("express");
 const NodeMailer = require("nodemailer");
@@ -14,6 +15,27 @@ let globalDatabaseConfiguration = null;
 let globalEmailConfiguration = null;
 
 SiteMonitor = exports;
+
+
+/**
+ * Replace occurrences of {token} with matching keyed values from parameters array.
+ *
+ * @param {string} text text containing tokens to be replaced.
+ * @param {Array} parameters array/object of key/value pairs to match keys as tokens in text and replace with value.
+ * @return {string} text replaced string.
+ */
+function tokenReplace(text, parameters) {
+    var token,
+        regexMatch;
+
+    for (token in parameters) {
+        if (parameters.hasOwnProperty(token)) {
+            regexMatch = new RegExp("\{" + token + "\}", "g");
+            text = text.replace(regexMatch, parameters[token]);
+        }
+    }
+    return text;
+};
 
 /**
  * Return a Promise for a database connection. Reject is called if a connection fails.
@@ -351,6 +373,36 @@ async function sendAlert(siteConfiguration) {
 }
 
 /**
+ * Render the status HTML page.
+ * @param {Request} request Express request object.
+ * @param {Response} response Express response object
+ */
+function renderStatusPage(request, response) {
+    const statusTemplate = "./source/views/status.html";
+    const query = request.query;
+    logger.info("SiteMonitor request for /status by " + request.get("referer") + " from " + request.ip);
+    if (query.pass == configuration.shutdownpassword) {
+        // read template file views/status.html
+        // replace
+        let pageParameters = {
+            status: "Running",
+            lastSample: "today",
+            lastError: "yesterday",
+            sitesTable: "this is the table HTML"
+        };
+        fs.readFile(statusTemplate, "utf8", function(fsError, fileContent) {
+            if (fsError) {
+                logger.error("SiteMonitor cannot read template file " + statusTemplate + ": " + fsError.toString());
+            } else {
+                response.send(tokenReplace(fileContent, pageParameters));
+            }
+        });
+    } else {
+        response.send("You contacted the STATUS endpoint.");
+    }
+}
+
+/**
  * Conduct a sample given the site definition (from the configuration.) This is asynchronous:
  * a Promise is returned that will resolve once the sample is complete.
  * 
@@ -499,6 +551,7 @@ function startWebServer(configuration) {
             response.send("You contacted the STOP endpoint.");
         }
     });
+    app.get("/status", renderStatusPage);
     app.use(Express.static("./source/public", staticWebsiteOptions));
     app.listen(configuration.websiteport || 3399);
 }
