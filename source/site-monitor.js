@@ -1,3 +1,9 @@
+/**
+ * Site monitor export module. Provides public interface on the exported module `SiteMonitor`.
+ * SiteMonitor.startMonitor(configuration, debugLogger): Start the site monitor with a configuration and a logging interface.
+ * SiteMonitor.stopMonitor(): Stop the site monitor.
+ * SiteMonitor.dynamicReset(configuration): Restart the site monitor with a new configuration while leaving any current captured data in tact.
+ */
 const Request = require("request");
 const fs = require("fs");
 const MySQL = require("mysql");
@@ -303,12 +309,20 @@ function saveSample(sampleData) {
 
 /**
  * Consolidate samples. This merges old records into aggregate samples.
+ * consecutive error records get merged into error samples
  * Samples older than 1 month get merged into monthly samples by month
  * Samples older than 7 days get merged into weekly samples by week
  * Samples older than 1 day get merged into daily samples
  * Samples older than 1 hour get merged into hourly samples and the individual samples get deleted.
  */
 function consolidateDatabase() {
+    /*
+    SELECT site_name, COUNT(*) AS samples, MIN(sample_time) AS first_sample, MAX(sample_time) AS last_sample, AVG(response_time) AS response_time
+    FROM monitor_samples
+    WHERE sample_type="sample"
+    GROUP BY site_name
+    ORDER BY 1;
+    */
 }
 
 function recordSampleError(siteConfiguration, responseTime, error) {
