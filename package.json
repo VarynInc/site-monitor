@@ -27,13 +27,13 @@
   "homepage": "https://github.com/VarynInc/site-monitor#readme",
   "dependencies": {
     "chalk": "^2.4.2",
-    "express": "^4.16.4",
-    "jest": "^24.3.1",
-    "mysql": "^2.16.0",
-    "nodemailer": "^5.1.1",
+    "express": "^4.17.1",
+    "jest": "^24.8.0",
+    "mysql": "^2.17.0",
+    "nodemailer": "^6.3.0",
     "nodemailer-mailgun-transport": "^1.4.0",
     "request": "^2.88.0",
     "winston": "^3.2.1",
-    "yargs": "^13.2.2"
+    "yargs": "^13.3.0"
   }
 }
