@@ -1,6 +1,6 @@
 {
   "name": "site-monitor",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Nodejs app to monitor sites and alert if they are not abiding by their normal operating condition",
   "main": "source/index.js",
   "scripts": {
@@ -26,14 +26,14 @@
   },
   "homepage": "https://github.com/VarynInc/site-monitor#readme",
   "dependencies": {
-    "chalk": "^2.4.2",
+    "chalk": "^4.0.0",
     "express": "^4.17.1",
-    "jest": "^24.8.0",
-    "mysql": "^2.17.0",
-    "nodemailer": "^6.3.0",
-    "nodemailer-mailgun-transport": "^1.4.0",
-    "request": "^2.88.0",
+    "jest": "^25.3.0",
+    "mysql": "^2.18.1",
+    "nodemailer": "^6.4.6",
+    "nodemailer-mailgun-transport": "^2.0.0",
+    "request": "^2.88.2",
     "winston": "^3.2.1",
-    "yargs": "^13.3.0"
+    "yargs": "^15.3.1"
   }
 }
