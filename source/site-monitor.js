@@ -277,7 +277,7 @@ function saveSample(sampleData) {
     return new Promise(function (resolve, reject) {
         if ( ! sampleData.site_name) {
             // sitename is mandatory
-            reject(new Error("Cannot save sampe: sitename is mandatory but it was not provided."));
+            reject(new Error("Cannot save sample: sitename is mandatory but it was not provided."));
         } else if ( ! isUsingDatabase) {
             // not using the database is a soft error
             resolve(null, null);
