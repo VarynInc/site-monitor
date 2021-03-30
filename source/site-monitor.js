@@ -36,7 +36,7 @@ function tokenReplace(text, parameters) {
 
     for (token in parameters) {
         if (parameters.hasOwnProperty(token)) {
-            regexMatch = new RegExp("\{" + token + "\}", "g");
+            regexMatch = new RegExp("{" + token + "}", "g");
             text = text.replace(regexMatch, parameters[token]);
         }
     }
