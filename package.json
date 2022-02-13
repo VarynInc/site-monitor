@@ -1,6 +1,6 @@
 {
   "name": "site-monitor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Nodejs app to monitor sites and alert if they are not abiding by their normal operating condition",
   "main": "source/index.js",
   "scripts": {
