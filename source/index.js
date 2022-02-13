@@ -1,7 +1,6 @@
 /**
  * Site Monitor web service entry point.
  */
-const Chalk = require("chalk");
 const fs = require("fs");
 const WinstonLogger = require("winston");
 const siteMonitor = require("./site-monitor");
@@ -154,6 +153,5 @@ function initSiteMonitor() {
         siteMonitor.startMonitor(configuration, logger);
     }
 }
-
 
 initSiteMonitor();

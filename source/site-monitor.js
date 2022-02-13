@@ -623,12 +623,14 @@ SiteMonitor.startMonitor = async function (configuration, debugLogger) {
                     // Even if this update fails let's try to start the monitor anyway
                     // TODO: Log this error
                     logger.error("SiteMonitor caught updateSitesTable error " + databaseError.toString());
+                    logger.info("SiteMonitor has started on " + (new Date()).toUTCString());
                     queueNextSample(siteList);
                 });
         })
         .catch(function (databaseError) {
             logger.error("SiteMonitor caught initializeDatabase error " + databaseError.toString());
             logger.info("SiteMonitor will start without logging to a database");
+            logger.info("SiteMonitor has started on " + (new Date()).toUTCString());
             initializeSiteSampling(siteList);
             queueNextSample(siteList);
         });
