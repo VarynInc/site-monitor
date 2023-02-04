@@ -326,19 +326,19 @@ function consolidateDatabase() {
 }
 
 function recordSampleError(siteConfiguration, responseTime, error) {
-    logger.info("recordSampleError for " + siteConfiguration.sitename + ": " + siteConfiguration.sampleurl);
+    logger.error("recordSampleError for " + siteConfiguration.sitename + ": " + siteConfiguration.sampleurl);
 }
 
 function recordSampleStatusError(siteConfiguration, responseTime, statusCode) {
-    logger.info("recordSampleStatusError for " + siteConfiguration.sitename + ": " + siteConfiguration.sampleurl);
+    logger.error("recordSampleStatusError for " + siteConfiguration.sitename + ": " + siteConfiguration.sampleurl);
 }
 
 function recordSampleTokenFailError(siteConfiguration, responseTime) {
-    logger.info("recordSampleTokenFailError for " + siteConfiguration.sitename + ": " + siteConfiguration.sampleurl);
+    logger.error("recordSampleTokenFailError for " + siteConfiguration.sitename + ": " + siteConfiguration.sampleurl);
 }
 
 function recordSampleErrorThresholdExceeded(siteConfiguration, responseTime) {
-    logger.info("recordSampleErrorThresholdExceeded for " + siteConfiguration.sitename + ": " + siteConfiguration.sampleurl);
+    logger.error("recordSampleErrorThresholdExceeded for " + siteConfiguration.sitename + ": " + siteConfiguration.sampleurl);
 }
 
 function recordSampleSuccess(siteConfiguration, responseTime) {
