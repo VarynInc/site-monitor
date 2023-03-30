@@ -32,3 +32,5 @@ ENGINE = INNODB
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
 
+-- Queries
+SELECT MAX(sample_time), MIN(response_time), MAX(response_time), AVG(response_time), COUNT(*) FROM monitor_samples WHERE site_name="Varyn";
