@@ -2,7 +2,7 @@
  * Test the expected operation of the site-monitor.js functionality.
  */
 
-var siteMonitor = require("../source/site-monitor");
+const siteMonitor = require("../source/site-monitor");
 
 test('Expect site-monitor.js to exist and contain required functions', function() {
     expect(siteMonitor).toBeDefined();

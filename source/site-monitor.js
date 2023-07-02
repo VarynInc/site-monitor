@@ -4,7 +4,7 @@
  * SiteMonitor.stopMonitor(): Stop the site monitor.
  * SiteMonitor.dynamicReset(configuration): Restart the site monitor with a new configuration while leaving any current captured data in tact.
  */
-const Request = require("request");
+const axios = require('axios');
 const fs = require("fs");
 const MySQL = require("mysql");
 const Express = require("express");
@@ -426,38 +426,42 @@ function renderStatusPage(request, response) {
 function sampleURL(siteConfiguration) {
     return new Promise(function(resolve, reject) {
         let startTime = Date.now();
-        Request(siteConfiguration.sampleurl, function(error, response, body) {
-            let responseTime = Date.now() - startTime;
-            if (error) {
-                recordSampleError(siteConfiguration, responseTime, error);
-            } else if (response) {
-                if (response.statusCode != 200) {
-                    recordSampleStatusError(siteConfiguration, responseTime, response.statusCode);
-                } else {
-                    let foundToken = body.search(siteConfiguration.expectedtoken);
-                    if (foundToken < 0) {
-                        recordSampleTokenFailError(siteConfiguration, responseTime);
-                    } else if ((responseTime / 1000) > siteConfiguration.alertloadtime) {
-                        siteConfiguration.samplefailedcount ++;
-                        siteConfiguration.sampleconsecutivefailedcount ++;
-                        if (siteConfiguration.sampleconsecutivefailedcount >= siteConfiguration.alertthreshold) {
-                            recordSampleErrorThresholdExceeded(siteConfiguration, responseTime);
-                            if ( ! siteConfiguration.alerted) {
-                                siteConfiguration.alerted = true;
-                                sendAlert(siteConfiguration);
-                            }
-                        } else {
-                            recordSampleSuccess(siteConfiguration, responseTime);
+        axios.get(siteConfiguration.sampleurl)
+        .then(function(response) {
+            const responseTime = Date.now() - startTime;
+            if (response.status != 200) {
+                recordSampleStatusError(siteConfiguration, responseTime, response.status);
+            } else {
+                let foundToken = response.data.search(siteConfiguration.expectedtoken);
+                if (foundToken < 0) {
+                    recordSampleTokenFailError(siteConfiguration, responseTime);
+                } else if ((responseTime / 1000) > siteConfiguration.alertloadtime) {
+                    siteConfiguration.samplefailedcount ++;
+                    siteConfiguration.sampleconsecutivefailedcount ++;
+                    if (siteConfiguration.sampleconsecutivefailedcount >= siteConfiguration.alertthreshold) {
+                        recordSampleErrorThresholdExceeded(siteConfiguration, responseTime);
+                        if ( ! siteConfiguration.alerted) {
+                            siteConfiguration.alerted = true;
+                            sendAlert(siteConfiguration);
                         }
                     } else {
-                        siteConfiguration.sampleconsecutivefailedcount = 0;
                         recordSampleSuccess(siteConfiguration, responseTime);
                     }
+                } else {
+                    siteConfiguration.sampleconsecutivefailedcount = 0;
+                    recordSampleSuccess(siteConfiguration, responseTime);
                 }
-            } else {
-                recordSampleError(siteConfiguration, responseTime, new Error("Service replied with no response."));
             }
             resolve();
+        })
+        .catch(function(requestError) {
+            const responseTime = Date.now() - startTime;
+            if (requestError.response) {
+                recordSampleStatusError(siteConfiguration, responseTime, requestError.response.status);
+            } else {
+                recordSampleError(siteConfiguration, responseTime, requestError.toString());
+            }
+            reject(requestError);
         });
     });
 }
