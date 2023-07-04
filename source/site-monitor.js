@@ -498,7 +498,7 @@ function sampleSite(siteConfiguration, siteList) {
  * This function scans the list of all active sites and determines the next site to sample.
  * Either a site's next sample time has passed, in which case we sample it immediately, or
  * a site's sample time is somewhere in the future and we find the nearest site's time and
- * wait until then. Once a site is ampled, this function is called again to determine the next site.
+ * wait until then. Once a site is sampled, this function is called again to determine the next site.
  * 
  * @param {Array} siteList The list of all sites we are monitoring.
  */
@@ -591,7 +591,7 @@ function initializeSiteSampling(siteList) {
         siteConfiguration.sampleconsecutivefailedcount = 0;
         siteConfiguration.alerted = false;
         if (siteConfiguration.active) {
-            siteConfiguration.next_sample_time = timenow + siteConfiguration.samplefrequency;
+            siteConfiguration.next_sample_time = 1; // force each site to sample once at start up, and then go based on its sample timer // timenow + siteConfiguration.samplefrequency;
         } else {
             siteConfiguration.next_sample_time = -1;
         }

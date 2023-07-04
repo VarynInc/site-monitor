@@ -128,6 +128,10 @@ function mergeArgs(args, configuration) {
 function initSiteMonitor() {
     const logger = WinstonLogger.createLogger({
         level: "error",
+        format: WinstonLogger.format.combine(
+            WinstonLogger.format.json(),
+            WinstonLogger.format.timestamp()
+        ),
         transports: [
             new WinstonLogger.transports.File({ filename: "site-monitor.log" })
         ]
@@ -144,6 +148,10 @@ function initSiteMonitor() {
         mergeArgs(args, configuration);
         logger.configure({
             level: configuration.verbose ? "verbose" : "info",
+            format: WinstonLogger.format.combine(
+                WinstonLogger.format.json(),
+                WinstonLogger.format.timestamp()
+            ),
             transports: [
                 new WinstonLogger.transports.Console(),
                 new WinstonLogger.transports.File({ filename: configuration.logfile })
