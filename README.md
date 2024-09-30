@@ -28,7 +28,7 @@ If the configuration changes the service must be restarted to read the updated c
 
 ## Operation
 
-`npm start` will run the monitor and the web server.
+`npm start` will run the monitor and the web server. You can also start the service by running `node source/index.js` on the command line.
 
 The web server will run from the port you set in the configuration:
 
