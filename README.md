@@ -18,7 +18,8 @@ You should have a database connection. It's not required, but saving samples to 
 is pretty much a requirement for this app. If you use a database, it must exist. The app will
 create the tables if it needs to, but it will not create a database.
 
-Edit `source/configuration.json` with your database connection information and your site definitions.
+Edit `source/configuration.json` with your database connection information and your site definitions. Be sure the
+user account has the necessary database privileges granted.
 
 Set `websiteport` to the port you want to run the web server on (default is 3399). This is for in-bound connections to
 view the stats and operation of the site monitor (the site monitor will handle out-bound requests on
