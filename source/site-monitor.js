@@ -6,7 +6,7 @@
  */
 const axios = require('axios');
 const fs = require("fs");
-const MySQL = require("mysql");
+const MySQL = require("mysql2");
 const Express = require("express");
 const NodeMailer = require("nodemailer");
 const MailGunTransport = require('nodemailer-mailgun-transport');
@@ -31,12 +31,9 @@ SiteMonitor = exports;
  * @return {string} text replaced string.
  */
 function tokenReplace(text, parameters) {
-    var token,
-        regexMatch;
-
-    for (token in parameters) {
+    for (const token in parameters) {
         if (parameters.hasOwnProperty(token)) {
-            regexMatch = new RegExp("{" + token + "}", "g");
+            const regexMatch = new RegExp("{" + token + "}", "g");
             text = text.replace(regexMatch, parameters[token]);
         }
     }
@@ -98,12 +95,12 @@ function initializeDatabase(databaseConnection) {
     return new Promise(function (resolve, reject) {
         if (databaseConnection && databaseConnection.host && databaseConnection.user) {
             createDatabase()
-                .then(function() {
-                    resolve();
-                })
-                .catch(function (databaseError) {
-                    reject(databaseError);
-                });
+            .then(function() {
+                resolve();
+            })
+            .catch(function (databaseError) {
+                reject(databaseError);
+            });
         } else {
             resolve();
         }
@@ -146,30 +143,30 @@ COLLATE utf8_general_ci;`;
 
     return new Promise (function(resolve, reject) {
         getDatabaseConnection()
-            .then(function (dbConnection) {
-                if (dbConnection != null) {
-                    dbConnection.query(createSitesTableSQL, function (databaseError, queryResults, fields) {
-                        if (databaseError) {
-                            // not able to create the table
-                            reject(databaseError);
-                        } else {
-                            dbConnection.query(createSamplesTableSQL, function (databaseError, queryResults, fields) {
-                                if (databaseError) {
-                                    // not able to create the table
-                                    reject(databaseError);
-                                } else {
-                                    resolve(queryResults, fields);
-                                }
-                            });
-                        }
-                    });
-                }
-            }, function (databaseError) {
-                reject(databaseError);
-            })
-            .catch(function (databaseError) {
-                reject(databaseError);
-            });
+        .then(function (dbConnection) {
+            if (dbConnection != null) {
+                dbConnection.query(createSitesTableSQL, function (databaseError, queryResults, fields) {
+                    if (databaseError) {
+                        // not able to create the table
+                        reject(databaseError);
+                    } else {
+                        dbConnection.query(createSamplesTableSQL, function (databaseError, queryResults, fields) {
+                            if (databaseError) {
+                                // not able to create the table
+                                reject(databaseError);
+                            } else {
+                                resolve(queryResults, fields);
+                            }
+                        });
+                    }
+                });
+            }
+        }, function (databaseError) {
+            reject(databaseError);
+        })
+        .catch(function (databaseError) {
+            reject(databaseError);
+        });
     });
 }
 
@@ -182,25 +179,60 @@ function resetDatabase() {
 
     return new Promise(function (resolve, reject) {
         getDatabaseConnection()
+        .then(function (dbConnection) {
+            if (dbConnection != null) {
+                dbConnection.query(dropTablesSQL, function (databaseError, queryResults, fields) {
+                    if (databaseError) {
+                        // not able to drop the tables.
+                        reject(databaseError);
+                    } else {
+                        createDatabase()
+                            .then(function (queryResults, fields) {
+                                // tables created.
+                                resolve(queryResults, fields);
+                            }, function (databaseError) {
+                                // table create has failed.
+                                reject(databaseError);
+                            })
+                            .catch(function(databaseError) {
+                                // table create has failed.
+                                reject(databaseError);
+                            })
+                    }
+                });
+            }
+        }, function (databaseError) {
+            // getting a connection failed.
+            reject(databaseError);
+        })
+        .catch(function (databaseError) {
+            // getting a connection failed.
+            reject(databaseError);
+        });
+    });
+}
+
+function updateSitesTable(siteList) {
+    return new Promise(function (resolve, reject) {
+        const saveSQL = `insert into monitor_sites set site_name=?, site_url=?, search_token=?, max_response_time=?, active=? on duplicate key update site_url=?, search_token=?, max_response_time=?, active=?`;
+        let siteCount = siteList.length;
+
+        siteList.forEach(function(site) {
+            getDatabaseConnection()
             .then(function (dbConnection) {
                 if (dbConnection != null) {
-                    dbConnection.query(dropTablesSQL, function (databaseError, queryResults, fields) {
+                    const saveData = [site.sitename, site.sampleurl, site.expectedtoken, site.maxloadtime, site.active, site.sampleurl, site.expectedtoken, site.maxloadtime, site.active];
+
+                    dbConnection.query(saveSQL, saveData, function (databaseError, queryResults, fields) {
                         if (databaseError) {
-                            // not able to drop the tables.
-                            reject(databaseError);
-                        } else {
-                            createDatabase()
-                                .then(function (queryResults, fields) {
-                                    // tables created.
-                                    resolve(queryResults, fields);
-                                }, function (databaseError) {
-                                    // table create has failed.
-                                    reject(databaseError);
-                                })
-                                .catch(function(databaseError) {
-                                    // table create has failed.
-                                    reject(databaseError);
-                                })
+                            // insdate failed but keep going.
+                            logger.error("Error inserting site information for " + site.sitename + ": " + databaseError.toString());
+                        // } else {
+                            // insert is good!
+                        }
+                        siteCount --;
+                        if (siteCount < 1) {
+                            resolve();
                         }
                     });
                 }
@@ -212,41 +244,6 @@ function resetDatabase() {
                 // getting a connection failed.
                 reject(databaseError);
             });
-    });
-}
-
-function updateSitesTable(siteList) {
-    return new Promise(function (resolve, reject) {
-        const saveSQL = `insert into monitor_sites set site_name=?, site_url=?, search_token=?, max_response_time=?, active=? on duplicate key update site_url=?, search_token=?, max_response_time=?, active=?`;
-        let siteCount = siteList.length;
-
-        siteList.forEach(function(site) {
-            getDatabaseConnection()
-                .then(function (dbConnection) {
-                    if (dbConnection != null) {
-                        const saveData = [site.sitename, site.sampleurl, site.expectedtoken, site.maxloadtime, site.active, site.sampleurl, site.expectedtoken, site.maxloadtime, site.active];
-
-                        dbConnection.query(saveSQL, saveData, function (databaseError, queryResults, fields) {
-                            if (databaseError) {
-                                // insdate failed but keep going.
-                                logger.error("Error inserting site information for " + site.sitename + ": " + databaseError.toString());
-                            // } else {
-                                // insert is good!
-                            }
-                            siteCount --;
-                            if (siteCount < 1) {
-                                resolve();
-                            }
-                        });
-                    }
-                }, function (databaseError) {
-                    // getting a connection failed.
-                    reject(databaseError);
-                })
-                .catch(function (databaseError) {
-                    // getting a connection failed.
-                    reject(databaseError);
-                });
         })
     });
 }
@@ -264,7 +261,6 @@ function updateSitesTable(siteList) {
  * @param {object} sampleData Provide the pieces of information you have about the sample or the error.
  */
 function saveSample(sampleData) {
-
     const saveSQL = `insert into monitor_samples set site_name=?, sample_type="sample", sample_time=now(), response_time=?, status_code=?, error_code=?, error_message=?, sample_data=?`;
     const sampleDataNormalized = [
         sampleData.site_name,
@@ -283,26 +279,26 @@ function saveSample(sampleData) {
             resolve(null, null);
         } else {
             getDatabaseConnection()
-                .then(function (dbConnection) {
-                    if (dbConnection != null) {
-                        dbConnection.query(saveSQL, sampleDataNormalized, function (databaseError, queryResults, fields) {
-                            if (databaseError) {
-                                // insert/query failed.
-                                reject(databaseError);
-                            } else {
-                                // insert is good!
-                                resolve(queryResults, fields);
-                            }
-                        });
-                    }
-                }, function (databaseError) {
-                    // getting a connection failed.
-                    reject(databaseError);
-                })
-                .catch(function (databaseError) {
-                    // getting a connection failed.
-                    reject(databaseError);
-                });
+            .then(function (dbConnection) {
+                if (dbConnection != null) {
+                    dbConnection.query(saveSQL, sampleDataNormalized, function (databaseError, queryResults, fields) {
+                        if (databaseError) {
+                            // insert/query failed.
+                            reject(databaseError);
+                        } else {
+                            // insert is good!
+                            resolve(queryResults, fields);
+                        }
+                    });
+                }
+            }, function (databaseError) {
+                // getting a connection failed.
+                reject(databaseError);
+            })
+            .catch(function (databaseError) {
+                // getting a connection failed.
+                reject(databaseError);
+            });
         }
     });
 }
@@ -347,14 +343,14 @@ function recordSampleSuccess(siteConfiguration, responseTime) {
         response_time: responseTime
     };
     saveSample(sampleData)
-        .then(function(queryResults, fields) {
-            logger.info("recordSampleSuccess for " + siteConfiguration.sitename);
-        }, function(databaseError) {
-            logger.error("recordSampleSuccess FAILED for " + siteConfiguration.sitename + ": " + databaseError.toString());
-        })
-        .catch(function(databaseError) {
-            logger.error("recordSampleSuccess caught error for " + siteConfiguration.sitename + ": " + databaseError.toString());
-        });
+    .then(function(queryResults, fields) {
+        logger.info({"sitename": siteConfiguration.sitename, "message": "recordSampleSuccess for " + siteConfiguration.sitename});
+    }, function(databaseError) {
+        logger.error("recordSampleSuccess FAILED for " + siteConfiguration.sitename + ": " + databaseError.toString());
+    })
+    .catch(function(databaseError) {
+        logger.error("recordSampleSuccess caught error for " + siteConfiguration.sitename + ": " + databaseError.toString());
+    });
 }
 
 /**
@@ -474,24 +470,24 @@ function sampleURL(siteConfiguration) {
  * @param {Array} siteList The list of all site configurations so we can figure out the next site to sample.
  */
 function sampleSite(siteConfiguration, siteList) {
-    let timenow = Date.now();
+    let timeNow = Date.now();
     sampleInProgress = true;
-    siteConfiguration.next_sample_time = timenow + siteConfiguration.samplefrequency;
+    siteConfiguration.next_sample_time = timeNow + siteConfiguration.samplefrequency;
     siteConfiguration.samplecount ++;
     sampleURL(siteConfiguration)
-        .then(function() {
-            sampleInProgress = false;
-            queueNextSample(siteList);
-        }, function (error) {
-            sampleInProgress = false;
-            logger.error("sampleSite soft error " + error.toString());
-            queueNextSample(siteList);
-        })
-        .catch (function(exception) {
-            sampleInProgress = false;
-            logger.error("sampleSite soft exception " + exception.toString());
-            queueNextSample(siteList);
-        });
+    .then(function() {
+        sampleInProgress = false;
+        queueNextSample(siteList);
+    }, function (error) {
+        sampleInProgress = false;
+        logger.error("sampleSite soft error " + error.toString());
+        queueNextSample(siteList);
+    })
+    .catch (function(exception) {
+        sampleInProgress = false;
+        logger.error("sampleSite soft exception " + exception.toString());
+        queueNextSample(siteList);
+    });
 }
 
 /**
@@ -506,7 +502,7 @@ function queueNextSample(siteList) {
 
     // Queue a sample only if the app wasn't request to stop and another sample is not in progress.
     if ( ! stopped && ! sampleInProgress) {
-        let timenow = Date.now();
+        let timeNow = Date.now();
         let next_sample_time = NaN;
         let next_sample_site = null;
 
@@ -523,12 +519,12 @@ function queueNextSample(siteList) {
                 }
             }
         };
-        if (next_sample_time <= timenow) {
+        if (next_sample_time <= timeNow) {
             // this sites sample time has already passed, sample this site now
             setImmediate(sampleSite, next_sample_site, siteList)
         } else {
             // this sample will queue to run at some time in the future
-            let deltaTime = next_sample_time - timenow
+            let deltaTime = next_sample_time - timeNow
             timerHandle = setTimeout(function() {
                 timerHandle = null;
                 sampleSite(next_sample_site, siteList);
@@ -580,7 +576,6 @@ function startWebServer(configuration) {
  * @param {Array} siteList List of sites to sample.
  */
 function initializeSiteSampling(siteList) {
-    let timenow = Date.now();
     for (let siteIndex = 0; siteIndex < siteList.length; siteIndex ++) {
         let siteConfiguration = siteList[siteIndex];
 
@@ -591,7 +586,7 @@ function initializeSiteSampling(siteList) {
         siteConfiguration.sampleconsecutivefailedcount = 0;
         siteConfiguration.alerted = false;
         if (siteConfiguration.active) {
-            siteConfiguration.next_sample_time = 1; // force each site to sample once at start up, and then go based on its sample timer // timenow + siteConfiguration.samplefrequency;
+            siteConfiguration.next_sample_time = 1; // force each site to sample once at start up, and then go based on its sample timer // timeNow + siteConfiguration.samplefrequency;
         } else {
             siteConfiguration.next_sample_time = -1;
         }
@@ -616,28 +611,29 @@ SiteMonitor.startMonitor = async function (configuration, debugLogger) {
         logger = debugLogger;
     }
     initializeDatabase(configuration.database)
-        .then(function() {
-            initializeSiteSampling(siteList);
-            updateSitesTable(siteList)
-                .then(function() {
-                    logger.info("SiteMonitor has started on " + (new Date()).toUTCString());
-                    queueNextSample(siteList);
-                })
-                .catch(function(databaseError) {
-                    // Even if this update fails let's try to start the monitor anyway
-                    // TODO: Log this error
-                    logger.error("SiteMonitor caught updateSitesTable error " + databaseError.toString());
-                    logger.info("SiteMonitor has started on " + (new Date()).toUTCString());
-                    queueNextSample(siteList);
-                });
-        })
-        .catch(function (databaseError) {
-            logger.error("SiteMonitor caught initializeDatabase error " + databaseError.toString());
-            logger.info("SiteMonitor will start without logging to a database");
-            logger.info("SiteMonitor has started on " + (new Date()).toUTCString());
-            initializeSiteSampling(siteList);
-            queueNextSample(siteList);
-        });
+    .then(function() {
+        initializeSiteSampling(siteList);
+        updateSitesTable(siteList)
+            .then(function() {
+                logger.info("SiteMonitor has started on " + (new Date()).toUTCString());
+                queueNextSample(siteList);
+            })
+            .catch(function(databaseError) {
+                // Even if this update fails let's try to start the monitor anyway
+                // TODO: Log this error
+                logger.error("SiteMonitor caught updateSitesTable error " + databaseError.toString());
+                logger.info("SiteMonitor has started on " + (new Date()).toUTCString());
+                queueNextSample(siteList);
+            });
+    })
+    .catch(function (databaseError) {
+        logger.error("SiteMonitor caught initializeDatabase error " + databaseError.toString());
+        logger.error(configuration.database);
+        logger.info("SiteMonitor will start without logging to a database");
+        logger.info("SiteMonitor has started on " + (new Date()).toUTCString());
+        initializeSiteSampling(siteList);
+        queueNextSample(siteList);
+    });
 
     startWebServer(configuration);
 };

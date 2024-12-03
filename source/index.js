@@ -157,7 +157,6 @@ function initSiteMonitor() {
                 new WinstonLogger.transports.File({ filename: configuration.logfile })
             ]
         });
-
         siteMonitor.startMonitor(configuration, logger);
     }
 }
