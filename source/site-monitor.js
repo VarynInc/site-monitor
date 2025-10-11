@@ -8,6 +8,7 @@ const axios = require('axios');
 const fs = require("fs");
 const MySQL = require("mysql2");
 const Express = require("express");
+const ExpressRateLimit = require("express-rate-limit");
 const NodeMailer = require("nodemailer");
 const MailGunTransport = require('nodemailer-mailgun-transport');
 
@@ -554,8 +555,14 @@ function startWebServer(configuration) {
             response.set('x-timestamp', Date.now())
         }
     };
+    const rateLimiter = ExpressRateLimit({
+        windowTime: 5 * 1000,
+        max: 1, // max 1 request every 5 seconds
+        standardHeaders: true, // Return rate limit info in the RateLimit-* headers
+        legacyHeaders: false, // Disable the X-RateLimit-* headers
+    });
 
-    app.get("/stop", function(request, response) {
+    app.get("/stop", rateLimiter, function(request, response) {
         const query = request.query;
         logger.info("Stopping SiteMonitor from /stop by " + request.get("referer") + " from " + request.ip);
         if (query.pass == configuration.shutdownpassword) {
@@ -565,7 +572,7 @@ function startWebServer(configuration) {
             response.send("You contacted the STOP endpoint.");
         }
     });
-    app.get("/status", renderStatusPage);
+    app.get("/status", rateLimiter, renderStatusPage);
     app.use(Express.static("./source/public", staticWebsiteOptions));
     app.listen(configuration.websiteport || 3399);
 }
