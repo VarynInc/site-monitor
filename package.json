@@ -31,7 +31,7 @@
     "express-rate-limit": "^8.1.1",
     "jest": "^30.2.0",
     "mysql2": "^3.15.2",
-    "nodemailer": "^8.0.4",
+    "nodemailer": "^8.0.5",
     "nodemailer-mailgun-transport": "^2.1.5",
     "winston": "^3.18.3",
     "yargs": "^18.0.0"
