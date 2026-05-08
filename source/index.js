@@ -5,14 +5,16 @@ const fs = require("fs");
 const WinstonLogger = require("winston");
 const siteMonitor = require("./site-monitor");
 const defaultConfigurationFile = "./source/configuration.json";
+const args = require("yargs");
+const hideBin = require("yargs/helpers").hideBin;
 
 /**
  * Overwrite any configuration options with values provided on the command line.
  * @return {object} Args object.
  */
 function getArgs() {
-    const args = require("yargs")
-    .options({
+    args(hideBin(process.argv))
+    .option({
         "config": {
             alias: "c",
             type: "string",
