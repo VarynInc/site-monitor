@@ -556,12 +556,13 @@ function startWebServer(configuration) {
         }
     };
     const rateLimiter = ExpressRateLimit({
-        windowTime: 5 * 1000,
+        windowMs: 5 * 1000,
         max: 1, // max 1 request every 5 seconds
         standardHeaders: true, // Return rate limit info in the RateLimit-* headers
         legacyHeaders: false, // Disable the X-RateLimit-* headers
     });
 
+    app.get("/status", rateLimiter, renderStatusPage);
     app.get("/stop", rateLimiter, function(request, response) {
         const query = request.query;
         logger.info("Stopping SiteMonitor from /stop by " + request.get("referer") + " from " + request.ip);
@@ -572,7 +573,6 @@ function startWebServer(configuration) {
             response.send("You contacted the STOP endpoint.");
         }
     });
-    app.get("/status", rateLimiter, renderStatusPage);
     app.use(Express.static("./source/public", staticWebsiteOptions));
     app.listen(configuration.websiteport || 3399);
 }
