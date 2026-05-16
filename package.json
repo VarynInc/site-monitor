@@ -5,7 +5,8 @@
   "main": "source/index.js",
   "scripts": {
     "start": "node source/index.js",
-    "test": "jest --detectOpenHandles --coverage test"
+    "test": "jest --detectOpenHandles --coverage test",
+    "updatedependencies": "node ../../libraries/npm-check-updates/build/cli.js -u"
   },
   "repository": {
     "type": "git",
@@ -26,10 +27,10 @@
   },
   "homepage": "https://github.com/VarynInc/site-monitor#readme",
   "dependencies": {
-    "axios": "^1.16.0",
+    "axios": "^1.16.1",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.5.1",
-    "jest": "^30.4.0",
+    "express-rate-limit": "^8.5.2",
+    "jest": "^30.4.2",
     "mysql2": "^3.22.3",
     "nodemailer": "^8.0.7",
     "nodemailer-mailgun-transport": "^2.1.5",

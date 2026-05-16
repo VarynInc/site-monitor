@@ -1,0 +1,224 @@
+{
+    "database": {
+        "host": "localhost",
+        "database": "",
+        "user": "",
+        "port": 3306,
+        "password": ""
+    },
+    "websiteport": 0,
+    "shutdownpassword": "",
+    "verbose": false,
+    "logfile": "site-monitor.log",
+    "sites": [
+        {
+            "sitename": "Enginesis",
+            "sampleurl": "https://enginesis.com/monitor.php",
+            "samplefrequency": 90,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": ["suppot@enginesis.com", "support@varyn.com"],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "Enginesis-q",
+            "sampleurl": "https://enginesis-q.com/monitor.php",
+            "samplefrequency": 800,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": [
+                "suppot@enginesis.com",
+                "support@varyn.com"
+            ],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "Varyn",
+            "sampleurl": "https://varyn.com/monitor.php",
+            "samplefrequency": 90,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": ["suppot@enginesis.com", "support@varyn.com"],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "Varyn-q",
+            "sampleurl": "https://varyn-q.com/monitor.php",
+            "samplefrequency": 800,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": [
+                "suppot@enginesis.com",
+                "support@varyn.com"
+            ],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "inXys",
+            "sampleurl": "https://inxys.net/monitor.php",
+            "samplefrequency": 132,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": [
+                "suppot@enginesis.com",
+                "support@varyn.com"
+            ],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "inXys-q",
+            "sampleurl": "https://inxys-q.net/monitor.php",
+            "samplefrequency": 800,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": [
+                "suppot@enginesis.com",
+                "support@varyn.com"
+            ],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "JumpyDot",
+            "sampleurl": "https://jumpydot.com/monitor.php",
+            "samplefrequency": 96,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": [
+                "suppot@enginesis.com",
+                "support@varyn.com"
+            ],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "JumpyDot-q",
+            "sampleurl": "https://jumpydot-q.com/monitor.php",
+            "samplefrequency": 800,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": [
+                "suppot@enginesis.com",
+                "support@varyn.com"
+            ],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "KillerQuiz",
+            "sampleurl": "https://killerquiz.com/monitor.php",
+            "samplefrequency": 160,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": ["suppot@enginesis.com", "support@varyn.com"],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "KillerQuiz-q",
+            "sampleurl": "https://killerquiz-q.com/monitor.php",
+            "samplefrequency": 800,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": ["suppot@enginesis.com", "support@varyn.com"],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "PuttPuttPlanet",
+            "sampleurl": "https://puttputtplanet.com/monitor.php",
+            "samplefrequency": 280,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": [
+                "suppot@enginesis.com",
+                "support@varyn.com"
+            ],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "PuttPuttPlanet-q",
+            "sampleurl": "https://puttputtplanet-q.com/monitor.php",
+            "samplefrequency": 800,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": [
+                "suppot@enginesis.com",
+                "support@varyn.com"
+            ],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        },
+        {
+            "sitename": "Customized Food and Fitness",
+            "sampleurl": "https://customizedfoodandfitness.com/monitor.php",
+            "samplefrequency": 320,
+            "expectedtoken": "PAGEOK",
+            "maxloadtime": 7,
+            "alertloadtime": 2,
+            "alertthreshold": 3,
+            "alertemail": [
+                "suppot@enginesis.com",
+                "support@varyn.com"
+            ],
+            "alertsms": [],
+            "active": true,
+            "debug": false,
+            "log": false
+        }
+    ]
+}
